@@ -1,6 +1,6 @@
 source $HOME/.config/nvim/keybinds.vim
 
-let g:coc_global_extensions = ['coc-pyright', 'coc-clangd', 'coc-vimtex', 'coc-json']
+let g:coc_global_extensions = ['coc-pyright', 'coc-clangd', 'coc-vimtex', 'coc-json', 'coc-rust-analyzer']
 let g:vimtex_view_general_viewer = 'okular'
 let g:vimtex_view_general_options = '--unique file:@pdf\#src:@line@tex'
 let g:vimtex_compiler_latexmk = {
@@ -40,7 +40,6 @@ set number
 command W :w
 
 syntax enable
-
 
 " Set internal encoding of vim, not needed on neovim, since coc.nvim using some
 " unicode characters in the file autoload/float.vim
@@ -93,20 +92,6 @@ else
   inoremap <silent><expr> <c-@> coc#refresh()
 endif
 
-
-" Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  elseif (coc#rpc#ready())
-    call CocActionAsync('doHover')
-  else
-    execute '!' . &keywordprg . " " . expand('<cword>')
-  endif
-endfunction
-
 " Highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
@@ -134,5 +119,5 @@ command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organize
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
 " provide custom statusline: lightline.vim, vim-airline.
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-set statusline+=%=%c,%l\ \|\ %{wordcount().words}\ words
+set statusline+=%=%F\ \|\ %c,%l\ \|\ %{wordcount().words}\ words
 

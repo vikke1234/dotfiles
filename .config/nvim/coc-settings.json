@@ -1,4 +1,5 @@
 {
     "rust-analyzer.updates.prompt": false,
-    "suggest.noselect": false
+    "suggest.enablePreselect": false,
+    "suggest.noselect": true
 }
