@@ -1,5 +1,6 @@
 source $HOME/.config/nvim/keybinds.vim
 
+let g:tex_comment_nospell=1
 let g:coc_global_extensions = ['coc-pyright', 'coc-clangd', 'coc-vimtex', 'coc-json', 'coc-rust-analyzer']
 let g:vimtex_view_general_viewer = 'okular'
 let g:vimtex_view_general_options = '--unique file:@pdf\#src:@line@tex'
