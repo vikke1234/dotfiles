@@ -7,7 +7,6 @@ let g:vimtex_compiler_latexmk = {
             \ 'build_dir' : 'build',
             \}
 
-
 call plug#begin('~/.vim/plugged')
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }

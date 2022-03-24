@@ -1,7 +1,7 @@
 let mapleader=","
 
 inoremap jk <esc>
-inoremap { {}<c-o>i
+inoremap { {}<esc>i
 nnoremap <silent><leader>c :noh<cr>
 inoremap <c-e> <c-o>A
 inoremap <c-o> <c-o>A<cr>
