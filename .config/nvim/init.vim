@@ -27,7 +27,9 @@ endif
 
 autocmd BufWritePre * :%s/\s\+$//e
 " Enable spell checking for latex
-au FileType tex set spell
+au FileType gitcommit,tex set spell
+au FileType gitcommit set textwidth = 62
+au FileType tex set textwidth = 79
 
 set foldmethod=indent
 set foldlevel=20
