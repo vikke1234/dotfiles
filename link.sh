@@ -1,9 +1,14 @@
 #!/bin/sh
 set -u
-set -e
 
-# would prefer if I found a way to get relative paths for linking but it
-# doesn't matter I suppose
-find . \( -path ./.git -prune -o -type f \) -a \
-    \! \( -name 'link.sh' -o -name ".git*" \) \
-    -exec /bin/ln -s $HOME/{} {} \;
+search_path=.
+
+# gets all files except git and this file and gets the relative path
+files=$(find "${search_path}" \( -path "${search_path}/.git" -prune -o \
+    -type f \) -a \! \( -name 'link.sh' -o -name ".git*" \) -print0 | \
+    xargs -0 realpath --relative-to=${search_path})
+
+for file in $files
+do
+    ln -s "$(pwd)/$file" "$HOME/$file"
+done
