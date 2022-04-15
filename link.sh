@@ -10,5 +10,5 @@ files=$(find "${search_path}" \( -path "${search_path}/.git" -prune -o \
 
 for file in $files
 do
-    ln -s "$(pwd)/$file" "$HOME/$file"
+    ln -sf "$(pwd)/$file" "$HOME/$file"
 done
