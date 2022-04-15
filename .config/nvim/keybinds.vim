@@ -6,10 +6,9 @@ nnoremap <silent><leader>c :noh<cr>
 inoremap <c-e> <c-o>A
 inoremap <c-o> <c-o>A<cr>
 nnoremap <silent><leader>u :FZF<CR>
-nnoremap <leader>t :execute "!stack runhaskell " . expand('%:r') . "Test.hs \| sed 's/\x1b\[[0-9;]*m//g'"<cr>
 nnoremap Q <nop>
 nnoremap <silent><leader>n :bn<cr>
-nnoremap <silent><leader>p :bp<cr>
+nnoremap <silent><leader>t :bp<cr>
 nnoremap <silent><leader>h :CocCommand clangd.switchSourceHeader<cr>
 nnoremap <leader>y "+y
 nnoremap <leader>l "+p
