@@ -9,12 +9,12 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 alias ls="ls -lh --color=auto --group-directories-first"
-alias vimrc="vim $HOME/.config/nvim/init.vim"
+alias vimrc="$EDITOR $HOME/.config/nvim/init.vim"
+alias zshrc="$EDITOR $HOME/.zshrc"
 alias gdb='gdb --quiet'
 
 autoload -Uz compinit
 compinit
-source <(kubectl completion zsh)
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -83,7 +83,7 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 # plugins=(git)
 
-source $ZSH/oh-my-zsh.sh
+#source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
