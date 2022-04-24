@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/viktorh/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh/"
 export EDITOR=nvim
 export PATH="$HOME/.cargo/bin/:$HOME/bin:$HOME/bin/oss-cad-suite/bin:$PATH"
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --'
@@ -21,6 +21,7 @@ compinit
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="robbyrussell"
 
+source "$ZSH/oh-my-zsh.sh"
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
