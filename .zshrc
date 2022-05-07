@@ -7,11 +7,13 @@ export EDITOR=nvim
 export PATH="$HOME/.cargo/bin/:$HOME/bin:$HOME/bin/oss-cad-suite/bin:$PATH"
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export QT_LOGGING_RULES="*=false"
 
 alias ls="ls -lh --color=auto --group-directories-first"
 alias vimrc="$EDITOR $HOME/.config/nvim/init.vim"
 alias zshrc="$EDITOR $HOME/.zshrc"
 alias gdb='gdb --quiet'
+alias vim="$EDITOR"
 
 autoload -Uz compinit
 compinit
