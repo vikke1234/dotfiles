@@ -14,6 +14,7 @@ alias vimrc="$EDITOR $HOME/.config/nvim/init.vim"
 alias zshrc="$EDITOR $HOME/.zshrc"
 alias gdb='gdb --quiet'
 alias vim="$EDITOR"
+alias pastebinit='pastebinit -a '' -b dpaste.com'
 
 autoload -Uz compinit
 compinit
