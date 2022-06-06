@@ -2,8 +2,7 @@
 # error on both undefined variables and other errors
 set -ue
 
-if [ -f /usr/bin/nvim ]
-then
+if [ -f /usr/bin/nvim ]; then
     vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
 else
     vim_plug_path="~/.vim/autoload/plug.vim"
@@ -13,20 +12,19 @@ fi
 NODE_BASE_URL="https://nodejs.org/dist/v16.15.0"
 ARCH=$(uname -m)
 
-if [ $ARCH == "x86_64" ]; then
-    NODE_FILENAME="node-v16.15.0-linux-x64.tar.xz"
-    NODE_URL="$NODE_BASE_URL/node-v16.15.0-linux-x64.tar.xz"
-elif [ $ARCH == "armv7*" ]; then
-    NODE_FILENAME="node-v16.15.0-linux-armv7l.tar.xz"
-    NODE_URL="$NODE_BASE_URL/"
-elif [ $ARCH == "armv8*" ]; then
-    NODE_FILENAME="node-v16.15.0-linux-arm64.tar.xz"
-    NODE_URL="$NODE_BASE_URL/$NODE_FILENAME"
+if [ $ARCH = "x86_64" ]; then
+    NODE_FILENAME="node-v16.15.0-linux-x64"
+elif [ $ARCH = "armv7*" ]; then
+    NODE_FILENAME="node-v16.15.0-linux-armv7l"
+elif [ $ARCH = "armv8*" ]; then
+    NODE_FILENAME="node-v16.15.0-linux-arm64"
 else
     echo "unknown arch"
     exit 1
 fi
 
+NODE_TAR_NAME="$NODE_FILENAME.tar.xz"
+NODE_URL="$NODE_BASE_URL/$NODE_TAR_NAME"
 NODE_PATH="$HOME/bin/$NODE_FILENAME"
 
 mkdir -p ~/.config/nvim
@@ -40,15 +38,16 @@ fi
 
 if [ ! -d "$NODE_PATH" ]
 then
+    echo "Installing node"
     curl -S ${NODE_URL} \
-        --output $HOME/bin/$NODE_FILENAME
+        --output $HOME/bin/$NODE_TAR_NAME
     (
         cd ~/bin
-        tar xvf "$NODE_FILENAME"
+        tar xf "$NODE_TAR_NAME"
         ln -sf "$NODE_PATH/bin/node" .
         ln -sf "$NODE_PATH/bin/npx" .
         ln -sf "$NODE_PATH/bin/npm" .
-        rm "$HOME/bin/$NODE_FILENAME"
+        rm "$HOME/bin/$NODE_TAR_NAME"
     )
 fi
 
@@ -62,7 +61,8 @@ fi
 search_path=.
 current_path=$(pwd)
 
+echo "Linking dotfiles"
 # gets all files except git and this file and gets the relative path
 find "${search_path}" \( -path "${search_path}/.git" -prune -o \
-    -type f \) -a \! \( -name 'link.sh' -o -name ".git*" \) -exec \
+    -type f \) -a \! \( -name 'link.sh' -o -name ".git" -o -name ".gitignore" \) -exec \
     ln -sf  "${current_path}/{}" "$HOME/{}" \; -print
