@@ -1,6 +1,12 @@
 #!/bin/sh
 set -u
-vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
+if [ -f /usr/bin/nvim ]
+then
+    vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
+else
+    vim_plug_path="~/.vim/autoload/plug.vim"
+fi
+
 NODE_PATH="$HOME/bin/node-v16.15.0-linux-x64"
 
 mkdir -p ~/.config/nvim
