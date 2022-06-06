@@ -44,7 +44,7 @@ then
         --output $HOME/bin/$NODE_FILENAME
     (
         cd ~/bin
-        tar xvf "node-16.15.tar.xz"
+        tar xvf "$NODE_FILENAME"
         ln -sf "$NODE_PATH/bin/node" .
         ln -sf "$NODE_PATH/bin/npx" .
         ln -sf "$NODE_PATH/bin/npm" .
