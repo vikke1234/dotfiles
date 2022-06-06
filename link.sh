@@ -6,6 +6,7 @@ if [ -f /usr/bin/nvim ]; then
     vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
 else
     vim_plug_path="~/.vim/autoload/plug.vim"
+    ln -s $HOME/.config/nvim/init.vim $HOME/.vimrc
 fi
 
 
