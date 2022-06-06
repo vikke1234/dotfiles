@@ -14,7 +14,7 @@ nnoremap <leader>y "+y
 nnoremap <leader>l "+p
 vnoremap <leader>y "+y
 vnoremap <leader>l "+p
-nnoremap <leader>b :buffers<cr>:buffers<space>
+nnoremap <leader>b :buffers<cr>:buffer<space>
 
 " Mappings for CoCList
 " Show all diagnostics.

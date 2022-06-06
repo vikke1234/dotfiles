@@ -1,0 +1,24 @@
+[user]
+	email = viktor.horsmanheimo@gmail.com
+	name = Viktor Horsmanheimo
+[core]
+	editor = vim
+[alias]
+    c = commit
+    rb = rebase
+    co = checkout
+    st = status
+    n = checkout -b
+    b = branch
+    bc = branch --show-current
+    ll = log
+    l = log --graph --decorate --oneline
+
+[pull]
+	rebase = true
+[diff]
+	tool = vimdiff
+[merge]
+	tool = vimdiff
+[mergetool]
+	keepBackup = false
