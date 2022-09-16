@@ -2,6 +2,25 @@
 # error on both undefined variables and other errors
 set -ue
 
+PACKAGES='curl neovim'
+
+if [ -f /usr/bin/apt ]; then
+    PCKMGR=apt
+    MGRFLAGS='install'
+    REFRESH_PACKAGES='update'
+    PACKAGES="${PACKAGES} texlive latexmk"
+elif [ -f /usr/bin/pacman ]; then
+    PCKMGR=pacman
+    MGRFLAGS='-S'
+    REFRESH_PACKAGES='-Syy'
+    PACKAGES="${PACKAGES} texlive-most"
+fi
+
+sudo $PCKMGR $REFRESH_PACKAGES
+sudo $PCKMGR $MGRFLAGS $PACKAGES
+
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
 if [ -f /usr/bin/nvim ]; then
     vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
 else
