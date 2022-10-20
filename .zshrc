@@ -9,6 +9,12 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export QT_LOGGING_RULES="*=false"
 
+if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
+    export DISPLAY=$(grep nameserver /etc/resolv.conf | awk '{print $2}'):0.0
+    export WINHOME="/mnt/c/Users/Viktor"
+    export LIBGL_ALWAYS_INDIRECT=1
+fi
+
 alias ls="ls -lh --color=auto --group-directories-first"
 alias vimrc="$EDITOR $HOME/.config/nvim/init.vim"
 alias zshrc="$EDITOR $HOME/.zshrc"
