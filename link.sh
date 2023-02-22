@@ -92,7 +92,6 @@ current_path=$(pwd)
 echo "Linking dotfiles"
 ignored_files=('install.sh' 'link.sh' '.git*')
 ignore_flags=$(printf -- '-name %s -o ' ${ignored_files[@]} | sed 's/\-o $//')
-echo ${ignore_flags}
 
 # gets all files except git and this file and gets the relative path
 find "${search_path}" \( -path "${search_path}/.git" -prune -o \
