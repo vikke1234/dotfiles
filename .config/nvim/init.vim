@@ -39,7 +39,6 @@ set tabstop=4
 set expandtab
 set shiftwidth=4
 set cc=80
-set number
 
 command W :w
 
@@ -103,5 +102,5 @@ command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organize
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
 " provide custom statusline: lightline.vim, vim-airline.
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-set statusline+=%=%F\ \|\ %c,%l\ \|\ %{wordcount().words}\ words
+set statusline+=%=%F\ \|\ %l,%c\ \|\ %{wordcount().words}\ words
 
