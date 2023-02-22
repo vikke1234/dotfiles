@@ -50,8 +50,8 @@ NODE_PATH="$HOME/bin/$NODE_FILENAME"
 mkdir -p ~/.config/nvim
 mkdir -p $HOME/bin
 
-check_exists(cmd) {
-    if [ ! $! ]; then
+check_exists() {
+    if [ -z "$1" ]; then
         echo "No argument given to check_exists"
     fi
     $1 > /dev/null
@@ -63,7 +63,6 @@ check_exists(cmd) {
 check_exists "curl -V"
 check_exists "zsh --version"
 
-sh ./install.sh
 
 if [ ! -d "$NODE_PATH" ]
 then
@@ -92,9 +91,10 @@ current_path=$(pwd)
 
 echo "Linking dotfiles"
 ignored_files=('install.sh' 'link.sh' '.git*')
-ignore_flags=$(printf -- '-name %s -o ' ${ignored_files})
+ignore_flags=$(printf -- '-name %s -o ' ${ignored_files[@]} | sed 's/\-o $//')
+echo ${ignore_flags}
 
 # gets all files except git and this file and gets the relative path
 find "${search_path}" \( -path "${search_path}/.git" -prune -o \
-    -type f \) -a \! \( ${ignored_flags} \) -exec \
-    ln -sf  "${current_path}/{}" "$HOME/{}" \; -print
+    -type f \) -a \! \( ${ignore_flags} \) \
+    -exec ln -sf  "${current_path}/{}" "$HOME/{}" \; -print
