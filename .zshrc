@@ -15,7 +15,7 @@ if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
     export LIBGL_ALWAYS_INDIRECT=1
 fi
 
-if [ -f /etc/profile.d/debuginfod.sh ]; then
+if [ -r /etc/profile.d/debuginfod.sh ]; then
     source /etc/profile.d/debuginfod.sh
 fi
 alias ls="ls -lh --color=auto --group-directories-first"
