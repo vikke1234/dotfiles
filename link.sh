@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # error on both undefined variables and other errors
 set -ue
 
@@ -19,7 +19,9 @@ fi
 sudo $PCKMGR $REFRESH_PACKAGES
 sudo $PCKMGR $MGRFLAGS $PACKAGES
 
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
 
 if [ -f /usr/bin/nvim ]; then
     vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
