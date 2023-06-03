@@ -1,24 +1,27 @@
-[user]
-	email = viktor.horsmanheimo@gmail.com
-	name = Viktor Horsmanheimo
 [core]
-	editor = vim
+    editor = vim
 [alias]
-    c = commit
-    rb = rebase
-    co = checkout
-    st = status
-    n = checkout -b
-    b = branch
-    bc = branch --show-current
-    ll = log
-    l = log --graph --decorate --oneline
-
-[pull]
-	rebase = true
-[diff]
-	tool = vimdiff
-[merge]
-	tool = vimdiff
+# ordered by frequency of use
+l  = !git log
+ll = !git log --all --oneline --graph --decorate
+d  = !git diff
+st = !git status
+b  = !git branch
+bc = !git branch --show-current
+co = !git checkout
+cp = !git cherry-pick
+s  = !git show
+c  = !git commit
+rv = !git review
+rb = !git rebase
+p  = !git pull
+f  = !git fetch
+a  = !git add
+wc = !git whatchanged
+# helpers
+n  = !git checkout -b
 [mergetool]
-	keepBackup = false
+    keepBackup = false
+[merge]
+    tool = vimdiff
+
