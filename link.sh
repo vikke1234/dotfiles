@@ -42,11 +42,11 @@ do
     esac
 done
 
-if [ ! -z "${NOSUDO}" ]; then
+if [ "${NOSUDO}" ]; then
     install_system_packages
 fi
 
-if [ ! -d "$HOME/.oh-my-zsh" ] && [ ! -z "${IZSH}" ]; then
+    if [ ! -d "$HOME/.oh-my-zsh" ] && [ "${IZSH}" ]; then
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
