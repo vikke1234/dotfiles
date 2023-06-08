@@ -2,7 +2,28 @@
 # error on both undefined variables and other errors
 set -ue
 
+IZSH=0
+NOSUDO=0
+while getopts 'zn' opt
+do
+    case "$opt" in
+        z)
+            IZSH=1
+            ;;
+        n)
+            NOSUDO=1
+            ;;
+        ?)
+            echo -e "usage: ./link.sh [-n] [-z]\n\t-z Do not install zsh\n\t-n No sudo use"
+            exit 1
+            ;;
+    esac
+done
+
 PACKAGES='curl neovim'
+if [ -z "$IZSH" ]; then
+    PACKAGES="$PACKAGES zsh"
+fi
 
 if [ -f /usr/bin/apt ]; then
     PCKMGR=apt
@@ -27,7 +48,7 @@ if [ -f /usr/bin/nvim ]; then
     vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
 else
     vim_plug_path="~/.vim/autoload/plug.vim"
-    ln -s $HOME/.config/nvim/init.vim $HOME/.vimrc
+    ln -s $HOME/.config/nvim/init.vim $HOME/.vimrc || true
 fi
 
 
@@ -65,6 +86,16 @@ check_exists() {
 check_exists "curl -V"
 check_exists "zsh --version"
 
+if [ -z "$NOSUDO" ]; then
+    sudo $PCKMGR $REFRESH_PACKAGES
+    sudo $PCKMGR $MGRFLAGS $PACKAGES
+else
+    wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" || echo "failed to install nvim"
+fi
+
+if [ -z "$IZSH" ]; then
+    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
 
 if [ ! -d "$NODE_PATH" ]
 then
