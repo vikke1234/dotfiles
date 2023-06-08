@@ -2,8 +2,30 @@
 # error on both undefined variables and other errors
 set -ue
 
-IZSH=0
-NOSUDO=0
+install_system_packages() {
+    PACKAGES='curl'
+    if [ -z "$IZSH" ]; then
+        PACKAGES="$PACKAGES zsh"
+    fi
+
+    if [ -f /usr/bin/apt ]; then
+        PCKMGR=apt
+        MGRFLAGS='install'
+        REFRESH_PACKAGES='update'
+        PACKAGES="${PACKAGES} texlive latexmk"
+    elif [ -f /usr/bin/pacman ]; then
+        PCKMGR=pacman
+        MGRFLAGS='-S'
+        REFRESH_PACKAGES='-Syy'
+        PACKAGES="${PACKAGES} texlive-most"
+    fi
+
+    sudo $PCKMGR $REFRESH_PACKAGES
+    sudo $PCKMGR $MGRFLAGS $PACKAGES
+}
+
+IZSH=
+NOSUDO=
 while getopts 'zn' opt
 do
     case "$opt" in
@@ -20,27 +42,11 @@ do
     esac
 done
 
-PACKAGES='curl neovim'
-if [ -z "$IZSH" ]; then
-    PACKAGES="$PACKAGES zsh"
+if [ ! -z "${NOSUDO}" ]; then
+    install_system_packages
 fi
 
-if [ -f /usr/bin/apt ]; then
-    PCKMGR=apt
-    MGRFLAGS='install'
-    REFRESH_PACKAGES='update'
-    PACKAGES="${PACKAGES} texlive latexmk"
-elif [ -f /usr/bin/pacman ]; then
-    PCKMGR=pacman
-    MGRFLAGS='-S'
-    REFRESH_PACKAGES='-Syy'
-    PACKAGES="${PACKAGES} texlive-most"
-fi
-
-sudo $PCKMGR $REFRESH_PACKAGES
-sudo $PCKMGR $MGRFLAGS $PACKAGES
-
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
+if [ ! -d "$HOME/.oh-my-zsh" ] && [ ! -z "${IZSH}" ]; then
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
@@ -86,12 +92,7 @@ check_exists() {
 check_exists "curl -V"
 check_exists "zsh --version"
 
-if [ -z "$NOSUDO" ]; then
-    sudo $PCKMGR $REFRESH_PACKAGES
-    sudo $PCKMGR $MGRFLAGS $PACKAGES
-else
-    wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" || echo "failed to install nvim"
-fi
+wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" || echo "failed to install nvim"
 
 if [ -z "$IZSH" ]; then
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
