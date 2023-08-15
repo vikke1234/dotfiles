@@ -8,15 +8,18 @@ case $- in
       *) return;;
 esac
 
-export EDITOR=nvim
-export PATH="$HOME/.cargo/bin/:$HOME/bin:$HOME/bin/oss-cad-suite/bin:$PATH"
-export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --'
+export EDITOR=vim
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin/:$HOME/bin:$HOME/bin/oss-cad-suite/bin:$PATH"
+export FZF_DEFAULT_OPTS='--bind ctrl-j:accept'
+export FZF_DEFAULT_COMMAND='rg --files --hidden --follow -- 2>/dev/null'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export QT_LOGGING_RULES="*=false"
+export PYTHONDONTWRITEBYTECODE=1
 
 alias ls="ls -lh --color=auto --group-directories-first"
 alias vimrc="$EDITOR $HOME/.config/nvim/init.vim"
 alias zshrc="$EDITOR $HOME/.zshrc"
+alias bashrc="$EDITOR $HOME/.bashrc"
 alias gdb='gdb --quiet'
 alias vim="$EDITOR"
 
