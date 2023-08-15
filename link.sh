@@ -2,6 +2,8 @@
 # error on both undefined variables and other errors
 set -ue
 
+vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
+
 install_system_packages() {
     PACKAGES='curl'
     if [ -z "$IZSH" ]; then
@@ -46,26 +48,14 @@ if [ "${NOSUDO}" ]; then
     install_system_packages
 fi
 
-    if [ ! -d "$HOME/.oh-my-zsh" ] && [ "${IZSH}" ]; then
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-fi
-
-if [ -f /usr/bin/nvim ]; then
-    vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
-else
-    vim_plug_path="~/.vim/autoload/plug.vim"
-    ln -s $HOME/.config/nvim/init.vim $HOME/.vimrc || true
-fi
-
-
 NODE_BASE_URL="https://nodejs.org/dist/v16.15.0"
 ARCH=$(uname -m)
 
-if [ $ARCH = "x86_64" ]; then
+if [ "$ARCH" = "x86_64" ]; then
     NODE_FILENAME="node-v16.15.0-linux-x64"
-elif [ $ARCH = "armv7*" ]; then
+elif [ "$ARCH" = "armv7*" ]; then
     NODE_FILENAME="node-v16.15.0-linux-armv7l"
-elif [ $ARCH = "armv8*" ]; then
+elif [ "$ARCH" = "armv8*" ]; then
     NODE_FILENAME="node-v16.15.0-linux-arm64"
 else
     echo "unknown arch"
@@ -83,19 +73,21 @@ check_exists() {
     if [ -z "$1" ]; then
         echo "No argument given to check_exists"
     fi
-    $1 > /dev/null
-    if [ $? != 0 ]; then
+    if [ -z $(type -P "$1") ]; then
         echo "$1 does not exist"
+		exit 1
     fi
 }
 
-check_exists "curl -V"
-check_exists "zsh --version"
+check_exists "curl"
 
-wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" || echo "failed to install nvim"
+wget --quiet https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" || echo "failed to install nvim"
 
-if [ -z "$IZSH" ]; then
+if [[ -n "$IZSH" && $(check_exists "zsh") ]]; then
+	echo "Installing oh-my-zsh"
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+else
+	echo "Will not install oh-my-zsh"
 fi
 
 if [ ! -d "$NODE_PATH" ]
@@ -110,13 +102,15 @@ then
         ln -sf "$NODE_PATH/bin/npx" .
         ln -sf "$NODE_PATH/bin/npm" .
         rm "$HOME/bin/$NODE_TAR_NAME"
+		echo "installing yarn for markdown-preview"
+		./npm install --global yarn
     )
 fi
 
 if [ ! -f "${vim_plug_path}" ]
 then
-    echo "installing vim-plug"
-    sh -c "curl -fLo ${vim_plug_path} --create-dirs \
+    echo "Installing vim-plug"
+    sh -c "curl -sfLo ${vim_plug_path} --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
 fi
 
@@ -124,7 +118,7 @@ search_path=.
 current_path=$(pwd)
 
 echo "Linking dotfiles"
-ignored_files=('install.sh' 'link.sh' '.git*')
+ignored_files=('install.sh' 'link.sh' '.gitignore' '.git' '*.swp')
 ignore_flags=$(printf -- '-name %s -o ' ${ignored_files[@]} | sed 's/\-o $//')
 
 # gets all files except git and this file and gets the relative path
