@@ -1,5 +1,5 @@
 source $HOME/.config/nvim/keybinds.vim
-
+set mouse=
 let g:tex_comment_nospell=1
 let g:coc_global_extensions = ['coc-pyright', 'coc-clangd', 'coc-vimtex', 'coc-json', 'coc-rust-analyzer']
 let g:vimtex_view_general_viewer = 'okular'
@@ -15,6 +15,7 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'lervag/vimtex'
 Plug 'mfussenegger/nvim-dap'
+Plug 'tpope/vim-fugitive'
 call plug#end()
 
 " make floating window readable
@@ -36,7 +37,6 @@ au FileType gitcommit set textwidth=62
 set foldmethod=indent
 set foldlevel=20
 set tabstop=4
-set expandtab
 set shiftwidth=4
 set cc=80
 

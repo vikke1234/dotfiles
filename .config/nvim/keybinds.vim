@@ -1,5 +1,10 @@
 let mapleader=","
 
+" Git
+nnoremap <leader>gd :Gvdiff<cr>
+nnoremap gdh :diffget //2<cr>
+nnoremap gdl :diffget //3<cr>
+" Movement
 inoremap jk <esc>
 inoremap { {}<esc>i
 nnoremap <silent><leader>c :noh<cr>
@@ -15,7 +20,9 @@ nnoremap <leader>l "+p
 vnoremap <leader>y "+y
 vnoremap <leader>l "+p
 nnoremap <leader>b :buffers<cr>:buffer<space>
+nnoremap * *``
 
+nnoremap q: <nop>
 " Mappings for CoCList
 " Show all diagnostics.
 nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
