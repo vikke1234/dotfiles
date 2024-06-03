@@ -24,4 +24,7 @@ n  = !git checkout -b
     keepBackup = false
 [merge]
     tool = vimdiff
-
+[pull]
+	rebase = true
+[rerere]
+	enabled = true

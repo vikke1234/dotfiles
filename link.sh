@@ -5,7 +5,7 @@ set -ue
 vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
 
 install_system_packages() {
-    PACKAGES='curl'
+    PACKAGES='curl libfuse2'
     if [ -z "$IZSH" ]; then
         PACKAGES="$PACKAGES zsh"
     fi
@@ -81,7 +81,8 @@ check_exists() {
 
 check_exists "curl"
 
-wget --quiet https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" || echo "failed to install nvim"
+wget --quiet
+https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" && chmod +x "$HOME/bin/vim"|| echo "failed to install nvim"
 
 if [[ -n "$IZSH" && $(check_exists "zsh") ]]; then
 	echo "Installing oh-my-zsh"

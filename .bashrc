@@ -15,9 +15,12 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow -- 2>/dev/null'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export QT_LOGGING_RULES="*=false"
 export PYTHONDONTWRITEBYTECODE=1
+#export TERM="screen-256color"
+export TERM="xterm-256color"
 
+alias rp="realpath"
 alias ls="ls -lh --color=auto --group-directories-first"
-alias vimrc="$EDITOR $HOME/.config/nvim/init.vim"
+alias vimrc="$EDITOR $HOME/.config/nvim/init.lua"
 alias zshrc="$EDITOR $HOME/.zshrc"
 alias bashrc="$EDITOR $HOME/.bashrc"
 alias gdb='gdb --quiet'
@@ -130,3 +133,4 @@ export PATH=${PATH}:/opt/p4v/bin/
 export PATH=${PATH}:/opt/pycharm-community-2020.3.3/bin/
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+complete -rv
