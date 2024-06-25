@@ -81,8 +81,7 @@ check_exists() {
 
 check_exists "curl"
 
-wget --quiet
-https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" && chmod +x "$HOME/bin/vim"|| echo "failed to install nvim"
+wget --quiet https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" && chmod +x "$HOME/bin/vim"|| echo "failed to install nvim"
 
 if [[ -n "$IZSH" && $(check_exists "zsh") ]]; then
 	echo "Installing oh-my-zsh"
