@@ -102,8 +102,9 @@ then
         ln -sf "$NODE_PATH/bin/npx" .
         ln -sf "$NODE_PATH/bin/npm" .
         rm "$HOME/bin/$NODE_TAR_NAME"
-		echo "installing yarn for markdown-preview"
-		./npm install --global yarn
+        echo "installing yarn for markdown-preview"
+        ./npm install --global yarn tree-sitter-cli
+        echo "export PATH=\"$(npm bin -g):\$PATH\"" >> "$HOME/.bashrc"
     )
 fi
 

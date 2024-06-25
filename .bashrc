@@ -25,6 +25,9 @@ alias zshrc="$EDITOR $HOME/.zshrc"
 alias bashrc="$EDITOR $HOME/.bashrc"
 alias gdb='gdb --quiet'
 alias vim="$EDITOR"
+export DEV="/build/hammer/viktorh"
+. $DEV/compile
+export RCESIM_TIMEOUT=30
 
 
 
