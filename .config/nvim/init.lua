@@ -318,7 +318,7 @@ vim.o.mouse = 'a'
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
---vim.o.clipboard = 'unnamedplus'
+vim.o.clipboard = 'unnamedplus'
 vim.g.clipboard = {
   name = 'OSC 52',
   copy = {
@@ -330,7 +330,6 @@ vim.g.clipboard = {
     ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
   },
 }
-vim.keymap.set('n', 'y', '"+y')
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -383,15 +382,22 @@ vim.keymap.set('n', ",c", ":noh<cr>", {silent = true})
 vim.keymap.set('i', '<c-b>', '<esc>O')
 vim.keymap.set('n', 'q:', '<nop>')
 
+vim.keymap.set('i', '<A-h>', '<esc><C-w>h', { silent = true })
+vim.keymap.set('i', '<A-j>', '<esc><C-w>j', { silent = true })
+vim.keymap.set('i', '<A-k>', '<esc><C-w>k', { silent = true })
+vim.keymap.set('i', '<A-l>', '<esc><C-w>l', { silent = true })
+
 vim.keymap.set('n', '<A-h>', '<C-w>h', { silent = true })
 vim.keymap.set('n', '<A-j>', '<C-w>j', { silent = true })
 vim.keymap.set('n', '<A-k>', '<C-w>k', { silent = true })
 vim.keymap.set('n', '<A-l>', '<C-w>l', { silent = true })
+
 vim.keymap.set('t', '<A-h>', '<C-\\><C-n><C-w>h', { silent = true })
 vim.keymap.set('t', '<A-j>', '<C-\\><C-n><C-w>j', { silent = true })
 vim.keymap.set('t', '<A-k>', '<C-\\><C-n><C-w>k', { silent = true })
 vim.keymap.set('t', '<A-l>', '<C-\\><C-n><C-w>l', { silent = true })
 vim.keymap.set('t', 'jk', '<C-\\><C-n>')
+vim.keymap.set('n', 'q:', '<nop>')
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -408,6 +414,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
   defaults = {
+    find_files = {
+      theme = "dropdown"
+    },
     mappings = {
       i = {
         ['<C-u>'] = false,
@@ -416,6 +425,12 @@ require('telescope').setup {
       },
     },
   },
+  pickers = {
+    lsp_implementations = {
+      previewer = false,
+      layout_strategy = "flex",
+    }
+  }
 }
 
 -- Enable telescope fzf native, if installed
@@ -580,8 +595,8 @@ local on_attach = function(_, bufnr)
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
   nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+  nmap('gr', function() require('telescope.builtin').lsp_references { include_declaration=false, fname_width = 40, show_line = false, trim_text=true } end, '[G]oto [R]eferences')
+  nmap('gI', function() require('telescope.builtin').lsp_implementations { trim_text=true, show_line=false } end, '[G]oto [I]mplementation')
   nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
   nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
   nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')

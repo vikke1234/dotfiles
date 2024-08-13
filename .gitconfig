@@ -37,3 +37,5 @@ n  = !git checkout -b
 	rebase = true
 [rerere]
 	enabled = true
+[color]
+	ui = auto
