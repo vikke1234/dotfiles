@@ -1,128 +1,168 @@
 #!/bin/bash
-# error on both undefined variables and other errors
-set -ue
+# Strict bash mode for predictable errors
+set -euo pipefail
 
-vim_plug_path="${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim
+#--- CONFIGURATION ---
+VIM_PLUG_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim"
+NODE_VERSION="v16.15.0"
+NODE_BASE_URL="https://nodejs.org/dist/${NODE_VERSION}"
 
-install_system_packages() {
-    PACKAGES='curl libfuse2'
-    if [ -z "$IZSH" ]; then
-        PACKAGES="$PACKAGES zsh"
-    fi
+#--- ARGUMENT PARSING ---
+INSTALL_ZSH=1
+USE_SUDO=1
 
-    if [ -f /usr/bin/apt ]; then
-        PCKMGR=apt
-        MGRFLAGS='install'
-        REFRESH_PACKAGES='update'
-        PACKAGES="${PACKAGES} texlive latexmk"
-    elif [ -f /usr/bin/pacman ]; then
-        PCKMGR=pacman
-        MGRFLAGS='-S'
-        REFRESH_PACKAGES='-Syy'
-        PACKAGES="${PACKAGES} texlive-most"
-    fi
-
-    sudo $PCKMGR $REFRESH_PACKAGES
-    sudo $PCKMGR $MGRFLAGS $PACKAGES
+usage() {
+    echo "usage: $0 [-n] [-z]"
+    echo "  -z  Do not install Zsh"
+    echo "  -n  No sudo use"
+    exit 1
 }
 
-IZSH=
-NOSUDO=
 while getopts 'zn' opt
 do
     case "$opt" in
-        z)
-            IZSH=1
-            ;;
-        n)
-            NOSUDO=1
-            ;;
-        ?)
-            echo -e "usage: ./link.sh [-n] [-z]\n\t-z Do not install zsh\n\t-n No sudo use"
-            exit 1
-            ;;
+        z) INSTALL_ZSH=0 ;;
+        n) USE_SUDO=0 ;;
+        *) usage ;;
     esac
 done
 
-if [ "${NOSUDO}" ]; then
-    install_system_packages
-fi
-
-NODE_BASE_URL="https://nodejs.org/dist/v16.15.0"
-ARCH=$(uname -m)
-
-if [ "$ARCH" = "x86_64" ]; then
-    NODE_FILENAME="node-v16.15.0-linux-x64"
-elif [ "$ARCH" = "armv7*" ]; then
-    NODE_FILENAME="node-v16.15.0-linux-armv7l"
-elif [ "$ARCH" = "armv8*" ]; then
-    NODE_FILENAME="node-v16.15.0-linux-arm64"
-else
-    echo "unknown arch"
-    exit 1
-fi
-
-NODE_TAR_NAME="$NODE_FILENAME.tar.xz"
-NODE_URL="$NODE_BASE_URL/$NODE_TAR_NAME"
-NODE_PATH="$HOME/bin/$NODE_FILENAME"
-
-mkdir -p ~/.config/nvim
-mkdir -p $HOME/bin
-
+#--- UTILITIES ---
 check_exists() {
-    if [ -z "$1" ]; then
-        echo "No argument given to check_exists"
-    fi
-    if [ -z $(type -P "$1") ]; then
-        echo "$1 does not exist"
-		exit 1
+    local cmd="$1"
+    if ! command -v "$cmd" > /dev/null 2>&1; then
+        echo "$cmd is required but not installed."
+        exit 1
     fi
 }
 
+run_sudo() {
+    if [ "$USE_SUDO" -eq 1 ]; then
+        sudo "$@"
+    else
+        "$@"
+    fi
+}
+
+#--- DETECT PACKAGE MANAGER ---
+detect_pkgmgr() {
+    if command -v apt > /dev/null 2>&1; then
+        echo "apt"
+    elif command -v pacman > /dev/null 2>&1; then
+        echo "pacman"
+    elif command -v dnf > /dev/null 2>&1; then
+        echo "dnf"
+    else
+        echo "unknown"
+    fi
+}
+
+install_system_packages() {
+    local pkgs=("curl" "libfuse2")
+    [ "$INSTALL_ZSH" -eq 1 ] && pkgs+=("zsh")
+    local pkgmgr
+    pkgmgr=$(detect_pkgmgr)
+
+    case "$pkgmgr" in
+        apt)
+            pkgs+=("texlive" "latexmk")
+            run_sudo apt update
+            run_sudo apt install -y "${pkgs[@]}"
+            ;;
+        pacman)
+            pkgs+=("texlive-most")
+            run_sudo pacman -Syy
+            run_sudo pacman -S --noconfirm "${pkgs[@]}"
+            ;;
+        dnf)
+            pkgs+=("texlive")
+            run_sudo dnf install -y "${pkgs[@]}"
+            ;;
+        *)
+            echo "No supported package manager found."
+            exit 1
+            ;;
+    esac
+}
+
+#--- NODE ARCH DETECTION ---
+detect_node_filename() {
+    local arch
+    arch=$(uname -m)
+    case "$arch" in
+        x86_64) echo "node-${NODE_VERSION}-linux-x64" ;;
+        armv7l) echo "node-${NODE_VERSION}-linux-armv7l" ;;
+        aarch64) echo "node-${NODE_VERSION}-linux-arm64" ;;
+        *) echo "unknown"; return 1 ;;
+    esac
+}
+
+#--- SETUP DIRECTORIES ---
+mkdir -p "$HOME/bin" "$HOME/.config/nvim"
+
+#--- INSTALL PACKAGES ---
+install_system_packages
+
+#--- NEOVIM BINARY ---
 check_exists "curl"
+ARCH=$(uname -m)
+case "$ARCH" in
+    x86_64) NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage" ;;
+    aarch64) NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-arm64.appimage" ;;
+    *) echo "Unsupported architecture for Neovim AppImage"; exit 1 ;;
+esac
 
-wget --quiet https://github.com/neovim/neovim/releases/download/stable/nvim.appimage --output-document "$HOME/bin/vim" && chmod +x "$HOME/bin/vim"|| echo "failed to install nvim"
+curl -fsSL "$NVIM_URL" -o "$HOME/bin/nvim" && chmod +x "$HOME/bin/nvim" || { echo "Failed to install Neovim"; exit 1; }
 
-if [[ -n "$IZSH" && $(check_exists "zsh") ]]; then
-	echo "Installing oh-my-zsh"
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+#--- ZSH + OH-MY-ZSH ---
+if [ "$INSTALL_ZSH" -eq 1 ]; then
+    check_exists "zsh"
+    echo "Installing oh-my-zsh..."
+    if [ -d "$HOME/.oh-my-zsh" ]; then
+        echo "Oh-my-zsh already installed at $HOME/.oh-my-zsh, skipping."
+    else
+        sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    fi
 else
-	echo "Will not install oh-my-zsh"
+    echo "Skipping oh-my-zsh install."
 fi
 
-if [ ! -d "$NODE_PATH" ]
-then
-    echo "Installing node"
-    curl -S ${NODE_URL} \
-        --output $HOME/bin/$NODE_TAR_NAME
-    (
-        cd ~/bin
+#--- NODE AND YARN ---
+echo "Installing node"
+NODE_FILENAME=$(detect_node_filename)
+if [ "$NODE_FILENAME" = "unknown" ]; then
+    echo "Unknown architecture for Node.js install."
+    exit 1
+fi
+NODE_TAR_NAME="${NODE_FILENAME}.tar.xz"
+NODE_URL="${NODE_BASE_URL}/${NODE_TAR_NAME}"
+NODE_PATH="$HOME/bin/${NODE_FILENAME}"
+
+if [ ! -d "$NODE_PATH" ]; then
+    echo "Installing Node.js..."
+    curl -fsS "$NODE_URL" -o "$HOME/bin/$NODE_TAR_NAME"
+    ( 
+        cd "$HOME/bin"
         tar xf "$NODE_TAR_NAME"
         ln -sf "$NODE_PATH/bin/node" .
         ln -sf "$NODE_PATH/bin/npx" .
         ln -sf "$NODE_PATH/bin/npm" .
-        rm "$HOME/bin/$NODE_TAR_NAME"
-        echo "installing yarn for markdown-preview"
+        rm "$NODE_TAR_NAME"
         ./npm install --global yarn tree-sitter-cli
-        echo "export PATH=\"$(npm bin -g):\$PATH\"" >> "$HOME/.bashrc"
+        echo 'export PATH="$(npm bin -g):$PATH"' >> "$HOME/.bashrc"
     )
 fi
 
-if [ ! -f "${vim_plug_path}" ]
-then
-    echo "Installing vim-plug"
-    sh -c "curl -sfLo ${vim_plug_path} --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
-fi
+#--- LINK DOTFILES ---
+echo "Linking dotfiles..."
+IGNORED_FILES=('install.sh' 'link.sh' '.gitignore' '.git' '*.swp')
+SEARCH_PATH=.
+CURRENT_PATH=$(pwd)
+IGNORE_FLAGS=$(printf -- '-name %s -o ' "${IGNORED_FILES[@]}" | sed 's/ -o $//')
 
-search_path=.
-current_path=$(pwd)
+find "$SEARCH_PATH" \( -path "$SEARCH_PATH/.git" -prune -o -type f \) -a \
+    \! \( $IGNORE_FLAGS \) \
+    -exec ln -sf "$CURRENT_PATH/{}" "$HOME/{}" \; -print
 
-echo "Linking dotfiles"
-ignored_files=('install.sh' 'link.sh' '.gitignore' '.git' '*.swp')
-ignore_flags=$(printf -- '-name %s -o ' ${ignored_files[@]} | sed 's/\-o $//')
-
-# gets all files except git and this file and gets the relative path
-find "${search_path}" \( -path "${search_path}/.git" -prune -o \
-    -type f \) -a \! \( ${ignore_flags} \) \
-    -exec ln -sf  "${current_path}/{}" "$HOME/{}" \; -print
+echo "Setup completed successfully."
