@@ -12,6 +12,9 @@ vim.g.have_nerd_font = false
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+vim.o.tabstop = 4
 vim.o.number = true
 -- vim.o.relativenumber = true
 
@@ -130,8 +133,78 @@ vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" }
 -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
+-- [[ Cursor CLI Integration ]]
+-- Function to find Cursor CLI executable
+local function find_cursor_cli()
+	-- Common installation paths for Cursor CLI
+	local possible_paths = {
+		os.getenv("HOME") .. "/.local/bin/cursor",
+		"/usr/local/bin/cursor",
+		"/usr/bin/cursor",
+		os.getenv("HOME") .. "/Applications/Cursor.app/Contents/Resources/app/bin/cursor",
+	}
+
+	for _, path in ipairs(possible_paths) do
+		if vim.fn.executable(path) == 1 then
+			return path
+		end
+	end
+
+	-- Try to find it in PATH
+	local cursor_path = vim.fn.exepath("cursor")
+	if cursor_path ~= "" then
+		return cursor_path
+	end
+
+	return nil
+end
+
+-- Set up Cursor CLI path
+local cursor_cli = find_cursor_cli()
+
+if cursor_cli then
+	vim.g.cursor_cli_path = cursor_cli
+
+	-- Function to open current file in Cursor
+	local function open_in_cursor()
+		local file_path = vim.fn.expand("%:p")
+		if file_path ~= "" then
+			vim.fn.jobstart({ cursor_cli, file_path }, { detach = true })
+		else
+			vim.notify("No file to open in Cursor", vim.log.levels.WARN)
+		end
+	end
+
+	-- Function to open current directory in Cursor
+	local function open_dir_in_cursor()
+		local dir_path = vim.fn.expand("%:p:h")
+		vim.fn.jobstart({ cursor_cli, dir_path }, { detach = true })
+	end
+
+	-- Set up keybindings
+	vim.keymap.set("n", "<leader>co", open_in_cursor, { desc = "Open file in [C]urs[o]r" })
+	vim.keymap.set("n", "<leader>cd", open_dir_in_cursor, { desc = "Open [d]irectory in [C]ursor" })
+end
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
+local whitespace_group = vim.api.nvim_create_augroup("WhitespaceCleanup", { clear = true })
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+	group = whitespace_group,
+	pattern = "*",
+	callback = function()
+		-- Save cursor position
+		local cursor_pos = vim.api.nvim_win_get_cursor(0)
+
+		-- Remove trailing whitespace from all lines
+		vim.cmd([[%s/\s\+$//e]])
+
+		-- Restore cursor position
+		vim.api.nvim_win_set_cursor(0, cursor_pos)
+	end,
+	desc = "Remove trailing whitespace and blank lines at end of file before saving",
+})
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -673,9 +746,9 @@ require("lazy").setup({
 			--  - settings (table): Override the default settings passed when initializing the server.
 			--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 			local servers = {
-				-- clangd = {},
+				clangd = {},
 				-- gopls = {},
-				-- pyright = {},
+				pyright = {},
 				-- rust_analyzer = {},
 				-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
 				--
@@ -924,7 +997,19 @@ require("lazy").setup({
 			-- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
 			-- - sd'   - [S]urround [D]elete [']quotes
 			-- - sr)'  - [S]urround [R]eplace [)] [']
-			require("mini.surround").setup()
+			require("mini.surround").setup({
+				mappings = {
+					add = "<leader>sa", -- Add surrounding in Normal and Visual modes
+					delete = "<leader>sd", -- Delete surrounding
+					find = "<leader>sf", -- Find surrounding (to the right)
+					find_left = "<leader>sF", -- Find surrounding (to the left)
+					highlight = "<leader>sh", -- Highlight surrounding
+					replace = "<leader>sr", -- Replace surrounding
+
+					suffix_last = "l", -- Suffix to search with "prev" method
+					suffix_next = "n", -- Suffix to search with "next" method
+				},
+			})
 
 			-- Simple and easy statusline.
 			--  You could remove this setup call if you don't like it,

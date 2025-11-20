@@ -58,6 +58,7 @@ detect_pkgmgr() {
 }
 
 install_system_packages() {
+    [ "$USE_SUDO" -eq 0 ] && return
     local pkgs=("curl" "libfuse2")
     [ "$INSTALL_ZSH" -eq 1 ] && pkgs+=("zsh")
     local pkgmgr
@@ -107,8 +108,8 @@ install_system_packages
 check_exists "curl"
 ARCH=$(uname -m)
 case "$ARCH" in
-    x86_64) NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage" ;;
-    aarch64) NVIM_URL="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-arm64.appimage" ;;
+    x86_64) NVIM_URL="https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-x86_64.appimage" ;;
+    aarch64) NVIM_URL="https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-arm64.appimage" ;;
     *) echo "Unsupported architecture for Neovim AppImage"; exit 1 ;;
 esac
 
