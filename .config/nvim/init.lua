@@ -150,6 +150,7 @@ vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 vim.keymap.set("i", "jk", "<esc>")
 vim.keymap.set("i", "<c-e>", "<c-o>A")
+vim.keymap.set("i", "<C-a>", "<C-o>^", { desc = "Move to beginning of line" })
 vim.keymap.set("v", "<c-e>", "$")
 vim.keymap.set("n", ",c", ":noh<cr>", { silent = true })
 vim.keymap.set("i", "<c-b>", "<esc>O")
@@ -194,6 +195,12 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+
+-- Buffer management
+vim.keymap.set("n", "<leader>bn", "<cmd>bnext<CR>", { desc = "[B]uffer [N]ext" })
+vim.keymap.set("n", "<leader>bp", "<cmd>bprevious<CR>", { desc = "[B]uffer [P]revious" })
+vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "[B]uffer [D]elete" })
+vim.keymap.set("n", "<leader>bo", "<cmd>%bd|e#|bd#<CR>", { desc = "[B]uffer [O]nly (close all others)" })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -463,6 +470,17 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>sn", function()
 				builtin.find_files({ cwd = vim.fn.stdpath("config") })
 			end, { desc = "[S]earch [N]eovim files" })
+
+			-- Git-related searches
+			vim.keymap.set("n", "<leader>gc", function()
+				builtin.git_commits()
+			end, { desc = "[G]it [C]ommits" })
+			vim.keymap.set("n", "<leader>gs", function()
+				builtin.git_status()
+			end, { desc = "[G]it [S]tatus" })
+			vim.keymap.set("n", "<leader>gb", function()
+				builtin.git_branches()
+			end, { desc = "[G]it [B]ranches" })
 		end,
 	},
 
