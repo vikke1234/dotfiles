@@ -22,6 +22,7 @@ vim.o.mouse = "a"
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
+vim.o.cc = "80"
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
@@ -189,6 +190,58 @@ end
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 local whitespace_group = vim.api.nvim_create_augroup("WhitespaceCleanup", { clear = true })
+local header_guard_group = vim.api.nvim_create_augroup("AutoHeaderGuard", { clear = true })
+
+vim.api.nvim_create_autocmd("BufNewFile", {
+	group = header_guard_group,
+	pattern = "*.h",
+	desc = "Insert header guard for new C header files",
+	callback = function(event)
+		local buf = event.buf
+		if vim.api.nvim_buf_line_count(buf) > 1 then
+			return
+		end
+
+		local first_line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+		if first_line and first_line ~= "" then
+			return
+		end
+
+		local file_name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":t")
+		if file_name == "" then
+			return
+		end
+
+		local guard = file_name:gsub("%.", "_"):gsub("[^%w_]", "_"):upper()
+		guard = guard:gsub("_+", "_")
+		guard = guard:gsub("^_", "")
+
+		if guard == "" then
+			return
+		end
+
+		if guard:match("^[0-9]") then
+			guard = "_" .. guard
+		end
+
+		if guard:sub(-1) ~= "_" then
+			guard = guard .. "_"
+		end
+
+		local lines = {
+			"#ifndef " .. guard,
+			"#define " .. guard,
+			"",
+			"#endif /* " .. guard .. " */",
+		}
+
+		vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+
+		if vim.api.nvim_get_current_buf() == buf then
+			vim.api.nvim_win_set_cursor(0, { 3, 0 })
+		end
+	end,
+})
 
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = whitespace_group,
@@ -283,10 +336,30 @@ require("lazy").setup({
 		config = function(_, opts)
 			require("gitsigns").setup(opts)
 			-- Git hunk keymaps under <leader>g
-			vim.keymap.set({ "n", "v" }, "<leader>ghs", "<cmd>Gitsigns stage_hunk<CR>", { desc = "[G]it [H]unk [S]tage" })
-			vim.keymap.set({ "n", "v" }, "<leader>ghr", "<cmd>Gitsigns reset_hunk<CR>", { desc = "[G]it [H]unk [R]eset" })
-			vim.keymap.set("n", "<leader>ghS", "<cmd>Gitsigns stage_buffer<CR>", { desc = "[G]it [H]unk [S]tage Buffer" })
-			vim.keymap.set("n", "<leader>ghu", "<cmd>Gitsigns undo_stage_hunk<CR>", { desc = "[G]it [H]unk [U]ndo Stage" })
+			vim.keymap.set(
+				{ "n", "v" },
+				"<leader>ghs",
+				"<cmd>Gitsigns stage_hunk<CR>",
+				{ desc = "[G]it [H]unk [S]tage" }
+			)
+			vim.keymap.set(
+				{ "n", "v" },
+				"<leader>ghr",
+				"<cmd>Gitsigns reset_hunk<CR>",
+				{ desc = "[G]it [H]unk [R]eset" }
+			)
+			vim.keymap.set(
+				"n",
+				"<leader>ghS",
+				"<cmd>Gitsigns stage_buffer<CR>",
+				{ desc = "[G]it [H]unk [S]tage Buffer" }
+			)
+			vim.keymap.set(
+				"n",
+				"<leader>ghu",
+				"<cmd>Gitsigns undo_stage_hunk<CR>",
+				{ desc = "[G]it [H]unk [U]ndo Stage" }
+			)
 			vim.keymap.set("n", "<leader>ghp", "<cmd>Gitsigns preview_hunk<CR>", { desc = "[G]it [H]unk [P]review" })
 			vim.keymap.set("n", "<leader>ghb", "<cmd>Gitsigns blame_line<CR>", { desc = "[G]it [H]unk [B]lame" })
 			vim.keymap.set("n", "<leader>ghd", "<cmd>Gitsigns diffthis<CR>", { desc = "[G]it [H]unk [D]iff" })

@@ -136,3 +136,5 @@ export PATH=${PATH}:/opt/pycharm-community-2020.3.3/bin/
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 complete -rv
+. "$HOME/.cargo/env"
+. $HOME/.profile

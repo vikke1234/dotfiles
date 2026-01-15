@@ -8,27 +8,31 @@ username = viktorh
 [gitreview]
     remote = origin
 [core]
-    editor = vim
+    editor = nvim
 [alias]
-# ordered by frequency of use
-l  = !git log
-ll = !git log --all --oneline --graph --decorate
-d  = !git diff
-st = !git status
-b  = !git branch
-bc = !git branch --show-current
-co = !git checkout
-cp = !git cherry-pick
-s  = !git show
-c  = !git commit
-rv = !git review
-rb = !git rebase
-p  = !git pull
-f  = !git fetch
-a  = !git add
-wc = !git whatchanged
-# helpers
-n  = !git checkout -b
+    # ordered by frequency of use
+    l  = log
+    ll = log --all --oneline --graph --decorate
+    d  = diff
+    st = status
+    b  = branch
+    bc = branch --show-current
+    co = checkout
+    cp = cherry-pick
+    s  = show
+    c  = commit
+    rv = review
+    rb = rebase
+    p  = pull
+    f  = fetch
+    a  = add
+	wc = log --raw --no-merges
+    # helpers
+    n  = checkout -b
+	soft = reset --soft @^
+	rs = restore --staged
+	ds = diff --staged
+	r = restore
 [mergetool]
     keepBackup = false
 [merge]
@@ -39,3 +43,5 @@ n  = !git checkout -b
 	enabled = true
 [color]
 	ui = auto
+[status]
+	relativePaths = true
