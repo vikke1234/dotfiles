@@ -25,8 +25,8 @@ alias zshrc="$EDITOR $HOME/.zshrc"
 alias bashrc="$EDITOR $HOME/.bashrc"
 alias gdb='gdb --quiet'
 alias vim="$EDITOR"
-export DEV="/build/$HOSTNAME/viktorh"
-export RCESIM_TIMEOUT=30
+shopt -u progcomp
+. "$HOME/.cargo/env"
 
 
 
@@ -136,5 +136,7 @@ export PATH=${PATH}:/opt/pycharm-community-2020.3.3/bin/
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 complete -rv
-. "$HOME/.cargo/env"
-. $HOME/.profile
+eval "$(zoxide init bash)"
+if [ -f "$HOME/.work.bash" ]; then
+    . "$HOME/.work.bash"
+fi
