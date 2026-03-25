@@ -13,8 +13,8 @@ vim.g.have_nerd_font = false
 --  For more options, you can see `:help option-list`
 
 vim.o.shiftwidth = 4
+vim.o.tabstop = 8
 vim.o.expandtab = true
-vim.o.tabstop = 4
 vim.o.number = true
 -- vim.o.relativenumber = true
 
@@ -366,6 +366,23 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>ghD", "<cmd>Gitsigns diffthis ~<CR>", { desc = "[G]it [H]unk [D]iff ~" })
 			vim.keymap.set("n", "]h", "<cmd>Gitsigns next_hunk<CR>", { desc = "Next [H]unk" })
 			vim.keymap.set("n", "[h", "<cmd>Gitsigns prev_hunk<CR>", { desc = "Prev [H]unk" })
+		end,
+	},
+
+	-- vim-fugitive for git operations and conflict resolution
+	{
+		"tpope/vim-fugitive",
+		cmd = { "Git", "Gdiffsplit", "Gvdiffsplit", "Gread", "Gwrite" },
+		keys = {
+			{ "<leader>gg", "<cmd>Git<cr>", desc = "[G]it Status" },
+			{ "<leader>gd", "<cmd>Gvdiffsplit!<cr>", desc = "[G]it [D]iff 3-way" },
+			{ "<leader>gw", "<cmd>Gwrite<cr>", desc = "[G]it [W]rite (stage)" },
+			{ "<leader>gr", "<cmd>Gread<cr>", desc = "[G]it [R]ead (checkout)" },
+		},
+		config = function()
+			-- Standard fugitive conflict resolution
+			vim.keymap.set("n", "<leader>gh", "<cmd>diffget //2<cr>", { desc = "[G]it get left (ours)" })
+			vim.keymap.set("n", "<leader>gl", "<cmd>diffget //3<cr>", { desc = "[G]it get right (theirs)" })
 		end,
 	},
 
@@ -1072,12 +1089,12 @@ require("lazy").setup({
 			-- - sr)'  - [S]urround [R]eplace [)] [']
 			require("mini.surround").setup({
 				mappings = {
-					add = "<leader>sa", -- Add surrounding in Normal and Visual modes
-					delete = "<leader>sd", -- Delete surrounding
-					find = "<leader>sf", -- Find surrounding (to the right)
-					find_left = "<leader>sF", -- Find surrounding (to the left)
-					highlight = "<leader>sh", -- Highlight surrounding
-					replace = "<leader>sr", -- Replace surrounding
+					add = "<leader>za", -- Add surrounding in Normal and Visual modes
+					delete = "<leader>zd", -- Delete surrounding
+					find = "<leader>zf", -- Find surrounding (to the right)
+					find_left = "<leader>zF", -- Find surrounding (to the left)
+					highlight = "<leader>zh", -- Highlight surrounding
+					replace = "<leader>zr", -- Replace surrounding
 
 					suffix_last = "l", -- Suffix to search with "prev" method
 					suffix_next = "n", -- Suffix to search with "next" method
