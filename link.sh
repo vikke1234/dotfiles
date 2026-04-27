@@ -116,19 +116,6 @@ esac
 curl -fsSL "$NVIM_URL" -o "$HOME/bin/nvim" && chmod +x "$HOME/bin/nvim" || { echo "Failed to install Neovim"; exit 1; }
 
 
-#--- ZSH + OH-MY-ZSH ---
-if [ "$INSTALL_ZSH" -eq 1 ]; then
-    check_exists "zsh"
-    echo "Installing oh-my-zsh..."
-    if [ -d "$HOME/.oh-my-zsh" ]; then
-        echo "Oh-my-zsh already installed at $HOME/.oh-my-zsh, skipping."
-    else
-        sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    fi
-else
-    echo "Skipping oh-my-zsh install."
-fi
-
 #--- NODE AND YARN ---
 echo "Installing node"
 NODE_FILENAME=$(detect_node_filename)
@@ -143,7 +130,7 @@ NODE_PATH="$HOME/bin/${NODE_FILENAME}"
 if [ ! -d "$NODE_PATH" ]; then
     echo "Installing Node.js..."
     curl -fsS "$NODE_URL" -o "$HOME/bin/$NODE_TAR_NAME"
-    ( 
+    (
         cd "$HOME/bin"
         tar xf "$NODE_TAR_NAME"
         ln -sf "$NODE_PATH/bin/node" .
